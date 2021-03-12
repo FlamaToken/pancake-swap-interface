@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text } from '@pancakeswap-libs/uikit'
+import { Text } from '@igniswap/uikit'
 import { ChainId, Currency, currencyEquals, ETHER, Token } from '@igniswap/sdk'
 import styled from 'styled-components'
 
