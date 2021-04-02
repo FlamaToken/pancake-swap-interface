@@ -15,7 +15,7 @@ import Card from '../Card'
 import { AutoColumn } from '../Column'
 import CurrencyLogo from '../CurrencyLogo'
 import DoubleCurrencyLogo from '../DoubleLogo'
-import { RowBetween, RowFixed } from '../Row'
+import { RowBetween, RowFixed, AutoRow } from '../Row'
 import { Dots } from '../swap/styleds'
 
 export const FixedHeightRow = styled(RowBetween)`
@@ -48,14 +48,14 @@ export function MinimalPositionCard({ pair, showUnwrapped = false }: PositionCar
 
   const [token0Deposited, token1Deposited] =
     !!pair &&
-    !!totalPoolTokens &&
-    !!userPoolBalance &&
-    // this condition is a short-circuit in the case where useTokenBalance updates sooner than useTotalSupply
-    JSBI.greaterThanOrEqual(totalPoolTokens.raw, userPoolBalance.raw)
+      !!totalPoolTokens &&
+      !!userPoolBalance &&
+      // this condition is a short-circuit in the case where useTokenBalance updates sooner than useTotalSupply
+      JSBI.greaterThanOrEqual(totalPoolTokens.raw, userPoolBalance.raw)
       ? [
-          pair.getLiquidityValue(pair.token0, totalPoolTokens, userPoolBalance, false),
-          pair.getLiquidityValue(pair.token1, totalPoolTokens, userPoolBalance, false),
-        ]
+        pair.getLiquidityValue(pair.token0, totalPoolTokens, userPoolBalance, false),
+        pair.getLiquidityValue(pair.token1, totalPoolTokens, userPoolBalance, false),
+      ]
       : [undefined, undefined]
 
   return (
@@ -71,7 +71,7 @@ export function MinimalPositionCard({ pair, showUnwrapped = false }: PositionCar
                   </Text>
                 </RowFixed>
               </FixedHeightRow>
-              <FixedHeightRow onClick={() => setShowMore(!showMore)}>
+              {/* <FixedHeightRow onClick={() => setShowMore(!showMore)}>
                 <RowFixed>
                   <DoubleCurrencyLogo currency0={currency0} currency1={currency1} margin size={20} />
                   <Text fontSize="14px">
@@ -81,7 +81,7 @@ export function MinimalPositionCard({ pair, showUnwrapped = false }: PositionCar
                 <RowFixed>
                   <Text fontSize="14px">{userPoolBalance ? userPoolBalance.toSignificant(4) : '-'}</Text>
                 </RowFixed>
-              </FixedHeightRow>
+              </FixedHeightRow> */}
               <AutoColumn gap="4px">
                 <FixedHeightRow>
                   <Text fontSize="14px">{currency0.symbol}:</Text>
@@ -134,85 +134,84 @@ export default function FullPositionCard({ pair }: PositionCardProps) {
 
   const [token0Deposited, token1Deposited] =
     !!pair &&
-    !!totalPoolTokens &&
-    !!userPoolBalance &&
-    // this condition is a short-circuit in the case where useTokenBalance updates sooner than useTotalSupply
-    JSBI.greaterThanOrEqual(totalPoolTokens.raw, userPoolBalance.raw)
+      !!totalPoolTokens &&
+      !!userPoolBalance &&
+      // this condition is a short-circuit in the case where useTokenBalance updates sooner than useTotalSupply
+      JSBI.greaterThanOrEqual(totalPoolTokens.raw, userPoolBalance.raw)
       ? [
-          pair.getLiquidityValue(pair.token0, totalPoolTokens, userPoolBalance, false),
-          pair.getLiquidityValue(pair.token1, totalPoolTokens, userPoolBalance, false),
-        ]
+        pair.getLiquidityValue(pair.token0, totalPoolTokens, userPoolBalance, false),
+        pair.getLiquidityValue(pair.token1, totalPoolTokens, userPoolBalance, false),
+      ]
       : [undefined, undefined]
 
   return (
-    <HoverCard>
-      <AutoColumn gap="12px">
-        <FixedHeightRow onClick={() => setShowMore(!showMore)} style={{ cursor: 'pointer' }}>
+    <AutoColumn gap="12px">
+      {/* <FixedHeightRow onClick={() => setShowMore(!showMore)} style={{ cursor: 'pointer' }}>
+        <RowFixed>
+          <DoubleCurrencyLogo currency0={currency0} currency1={currency1} margin size={20} />
+          <Text>{!currency0 || !currency1 ? <Dots>Loading</Dots> : `${currency0.symbol}/${currency1.symbol}`}</Text>
+        </RowFixed>
+      </FixedHeightRow> */}
+      <AutoColumn gap="8px">
+        <FixedHeightRow>
           <RowFixed>
-            <DoubleCurrencyLogo currency0={currency0} currency1={currency1} margin size={20} />
-            <Text>{!currency0 || !currency1 ? <Dots>Loading</Dots> : `${currency0.symbol}/${currency1.symbol}`}</Text>
+            <Text>Pooled {currency0.symbol}:</Text>
           </RowFixed>
-          <RowFixed>
-            {showMore ? (
-              <ChevronUp size="20" style={{ marginLeft: '10px' }} />
-            ) : (
-              <ChevronDown size="20" style={{ marginLeft: '10px' }} />
-            )}
-          </RowFixed>
+          {token0Deposited ? (
+            <RowFixed>
+              <Text ml="6px">{token0Deposited?.toSignificant(6)}</Text>
+              <CurrencyLogo size="20px" style={{ marginLeft: '8px' }} currency={currency0} />
+            </RowFixed>
+          ) : (
+            '-'
+          )}
         </FixedHeightRow>
-        {showMore && (
-          <AutoColumn gap="8px">
-            <FixedHeightRow>
-              <RowFixed>
-                <Text>Pooled {currency0.symbol}:</Text>
-              </RowFixed>
-              {token0Deposited ? (
-                <RowFixed>
-                  <Text ml="6px">{token0Deposited?.toSignificant(6)}</Text>
-                  <CurrencyLogo size="20px" style={{ marginLeft: '8px' }} currency={currency0} />
-                </RowFixed>
-              ) : (
-                '-'
-              )}
-            </FixedHeightRow>
 
-            <FixedHeightRow>
-              <RowFixed>
-                <Text>Pooled {currency1.symbol}:</Text>
-              </RowFixed>
-              {token1Deposited ? (
-                <RowFixed>
-                  <Text ml="6px">{token1Deposited?.toSignificant(6)}</Text>
-                  <CurrencyLogo size="20px" style={{ marginLeft: '8px' }} currency={currency1} />
-                </RowFixed>
-              ) : (
-                '-'
-              )}
-            </FixedHeightRow>
-            <FixedHeightRow>
-              <Text>Your pool tokens:</Text>
-              <Text>{userPoolBalance ? userPoolBalance.toSignificant(4) : '-'}</Text>
-            </FixedHeightRow>
-            <FixedHeightRow>
-              <Text>Your pool share:</Text>
-              <Text>{poolTokenPercentage ? `${poolTokenPercentage.toFixed(2)}%` : '-'}</Text>
-            </FixedHeightRow>
+        <FixedHeightRow>
+          <RowFixed>
+            <Text>Pooled {currency1.symbol}:</Text>
+          </RowFixed>
+          {token1Deposited ? (
+            <RowFixed>
+              <Text ml="6px">{token1Deposited?.toSignificant(6)}</Text>
+              <CurrencyLogo size="20px" style={{ marginLeft: '8px' }} currency={currency1} />
+            </RowFixed>
+          ) : (
+            '-'
+          )}
+        </FixedHeightRow>
+        <FixedHeightRow>
+          <Text>Your pool tokens:</Text>
+          <Text>{userPoolBalance ? userPoolBalance.toSignificant(4) : '-'}</Text>
+        </FixedHeightRow>
+        <FixedHeightRow>
+          <Text>Your pool share:</Text>
+          <Text>{poolTokenPercentage ? `${poolTokenPercentage.toFixed(2)}%` : '-'}</Text>
+        </FixedHeightRow>
 
-            <RowBetween marginTop="10px">
-              <Button as={Link} to={`/add/${currencyId(currency0)}/${currencyId(currency1)}`} style={{ width: '48%' }}>
-                Add
+        <AutoRow marginTop="1rem">
+          <AutoColumn gap="12px" style={{ margin: 'auto' }}>
+            <RowBetween>
+              <Button as={Link} to={`/add/${currencyId(currency0)}/${currencyId(currency1)}`} style={{ width: '23%' }}>
+                Deposit
               </Button>
               <Button
                 as={Link}
-                style={{ width: '48%' }}
+                style={{ width: '23%' }}
                 to={`/remove/${currencyId(currency0)}/${currencyId(currency1)}`}
               >
-                Remove
+                Withdraw
+              </Button>
+              <Button as={Link} to={`${'/'}`} style={{ width: '23%' }}>
+                Claim
+              </Button>
+              <Button as={Link} to={`${'/'}`} style={{ width: '23%' }}>
+                Reinvest
               </Button>
             </RowBetween>
           </AutoColumn>
-        )}
+        </AutoRow>
       </AutoColumn>
-    </HoverCard>
+    </AutoColumn>
   )
 }

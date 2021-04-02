@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from 'react'
-import { ThemeContext } from 'styled-components'
+import styled, { ThemeContext } from 'styled-components'
 import { Pair } from '@igniswap/sdk'
 import { Button, CardBody, Text } from '@igniswap/uikit'
 import { Link } from 'react-router-dom'
@@ -19,7 +19,33 @@ import { Dots } from 'components/swap/styleds'
 import TranslatedText from 'components/TranslatedText'
 import { TranslateString } from 'utils/translateTextHelpers'
 import PageHeader from 'components/PageHeader'
+import DoubleCurrencyLogo from 'components/DoubleLogo'
+import { unwrappedToken } from '../../utils/wrappedCurrency'
 import AppBody from '../AppBody'
+
+const StatusDiv = styled.div`
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+`;
+
+const StatusBold = styled.label`
+  font-size: 20px;
+  font-weight: 600;
+`;
+
+const StatusSubDiv = styled.label`
+  display: flex;
+  margin-bottom: 1rem;
+  flex-flow: row;
+  grid-gap: 1rem;
+  align-items: center;
+`;
+
+const StatusNormal = styled.label`
+  font-size: 14px;
+  color: #555;
+`;
 
 export default function Farm() {
   const theme = useContext(ThemeContext)
@@ -43,7 +69,7 @@ export default function Farm() {
   const liquidityTokensWithBalances = useMemo(
     () =>
       tokenPairsWithLiquidityTokens.filter(({ liquidityToken }) =>
-        v2PairsBalances[liquidityToken.address]?.greaterThan('0')
+        v2PairsBalances[liquidityToken.address]
       ),
     [tokenPairsWithLiquidityTokens, v2PairsBalances]
   )
@@ -53,18 +79,30 @@ export default function Farm() {
     fetchingV2PairBalances || v2Pairs?.length < liquidityTokensWithBalances.length || v2Pairs?.some((V2Pair) => !V2Pair)
 
   const allV2PairsWithLiquidity = v2Pairs.map(([, pair]) => pair).filter((v2Pair): v2Pair is Pair => Boolean(v2Pair))
+  
+  const currency0 = unwrappedToken(allV2PairsWithLiquidity[0].token0);
+  const currency1 = unwrappedToken(allV2PairsWithLiquidity[0].token1);
 
   return (
     <>
       <CardNav activeIndex={2} />
       <AppBody>
         <PageHeader title="Farm" description="Farm FLAP/BNB IGNI-LP to receive FLAP rewards">
+          <StatusDiv>
+            <DoubleCurrencyLogo currency0={currency0} currency1={currency1} size={50}/>
+            <StatusBold>APR: 200.00%</StatusBold>
+            <StatusBold>Available: 0.0000</StatusBold>
+            <StatusSubDiv>
+              <StatusNormal>Staked: 0.0000</StatusNormal>
+              <StatusNormal>0.00$ FLAP/BNB</StatusNormal>
+            </StatusSubDiv>
+          </StatusDiv>
           <Button id="join-pool-button" as={Link} to="/farm/FLAP">
             <TranslatedText translationId={100}>Add Liquidity with BNB</TranslatedText>
           </Button>
         </PageHeader>
         <AutoColumn gap="lg" justify="center">
-          <CardBody>
+          <CardBody style={{ width: '100%', padding: '1rem 2rem' }}>
             <AutoColumn gap="12px" style={{ width: '100%' }}>
               <RowBetween padding="0 8px">
                 <Text color={theme.colors.text}>
